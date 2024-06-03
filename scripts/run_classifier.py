@@ -52,13 +52,13 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-ALL_MODELS = sum(
-	(
-		tuple(conf.pretrained_config_archive_map.keys())
-		for conf in (BertConfig, RobertaConfig)
-	),
-	(),
-)
+# ALL_MODELS = sum(
+# 	(
+# 		tuple(conf.pretrained_config_archive_map.keys())
+# 		for conf in (BertConfig, RobertaConfig)
+# 	),
+# 	(),
+# )
 
 MODEL_CLASSES = {
 	"bert": (BertConfig, BertForSequenceClassification, BertTokenizer),
@@ -152,7 +152,8 @@ def train(args, train_dataset, model, tokenizer, labels, pad_token_label_id):
 	# Check if continuing training from a checkpoint
 	if os.path.exists(args.model_name_or_path):
 		# set global_step to gobal_step of last saved checkpoint from model path
-		global_step = int(args.model_name_or_path.split("-")[-1].split("/")[0])
+		# global_step = int(args.model_name_or_path.split("-")[-1].split("/")[0])
+		global_step = 0
 		epochs_trained = global_step // (len(train_dataloader) // args.gradient_accumulation_steps)
 		steps_trained_in_current_epoch = global_step % (len(train_dataloader) // args.gradient_accumulation_steps)
 
@@ -412,7 +413,7 @@ def main():
 		default=None,
 		type=str,
 		required=True,
-		help="Path to pre-trained model or shortcut name selected in the list: " + ", ".join(ALL_MODELS),
+		# help="Path to pre-trained model or shortcut name selected in the list: " + ", ".join(ALL_MODELS),
 	)
 	parser.add_argument(
 		"--output_dir",
@@ -569,13 +570,21 @@ def main():
 	labels = get_labels(model_version=args.model_version)
 	num_labels = len(labels)
 	# Use cross entropy ignore index as padding label id so that only real label ids contribute to the loss later
-	pad_token_label_id = CrossEntropyLoss().ignore_index
+	# loss = CrossEntropyLoss()
+	# if hasattr(loss, 'ignore_index'):
+	# 	pad_token_label_id = loss.ignore_index
+	# else:
+	# 	pad_token_label_id = -100
+	# 	CrossEntropyLoss.ignore_index = pad_token_label_id
+	pad_token_label_id = -100
 
 	# Load pretrained model and tokenizer
 	if args.local_rank not in [-1, 0]:
 		torch.distributed.barrier()  # Make sure only the first process in distributed training will download model & vocab
 
-	args.model_type = args.model_type.lower()
+	# model defination
+	args.model_type = args.model_type.lower() # bert
+	print(f'model_type: {args.model_type}, model_name_or_path: {args.model_name_or_path}')
 	config_class, model_class, tokenizer_class = MODEL_CLASSES[args.model_type]
 	config = config_class.from_pretrained(
 		args.config_name if args.config_name else args.model_name_or_path,

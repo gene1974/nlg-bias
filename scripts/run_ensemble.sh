@@ -9,18 +9,19 @@ export TEST_BASE=$(basename ${2})
 
 # Fixed params.
 export MAX_LENGTH=128
-export REGARD1_OUTPUT_DIR=models/bert_regard_v1
-export REGARD2_OUTPUT_DIR=models/bert_regard_v2
-export SENTIMENT1_OUTPUT_DIR=models/bert_sentiment_v1
-export SENTIMENT2_OUTPUT_DIR=models/bert_sentiment_v2
+export REGARD1_OUTPUT_DIR=models/regard_v1/bert_regard_v1
+export REGARD2_OUTPUT_DIR=models/regard_v2/bert_regard_v2
+export REGARD3_OUTPUT_DIR=models/bert_regard_v2_large
+export SENTIMENT1_OUTPUT_DIR=models/sentiment1/bert_sentiment_v1
+export SENTIMENT2_OUTPUT_DIR=models/sentiment2/bert_sentiment_v2
 export TEST_FILE=${TEST_BASE}.tsv.XYZ
 
 if [[ ${1} == "regard2" ]]
 then
     export OUTPUT_DIR=${REGARD2_OUTPUT_DIR}
-    export BERT_MODEL1=${OUTPUT_DIR}/checkpoint-90
+    export BERT_MODEL1=${OUTPUT_DIR}/checkpoint-80
     export BERT_MODEL2=${OUTPUT_DIR}_2/checkpoint-90
-    export BERT_MODEL3=${OUTPUT_DIR}_3/checkpoint-60
+    export BERT_MODEL3=${OUTPUT_DIR}_3/checkpoint-90
     export MODEL_VERSION=2
 elif [[ ${1} == "sentiment2" ]]
 then
@@ -43,6 +44,14 @@ then
     export BERT_MODEL2=${OUTPUT_DIR}_2/checkpoint-40
     export BERT_MODEL3=${OUTPUT_DIR}_3/checkpoint-50
     export MODEL_VERSION=1
+# regard_v3: https://github.com/ewsheng/controllable-nlg-biases
+elif [[ ${1} == "regard3" ]]
+then
+    export OUTPUT_DIR=${REGARD3_OUTPUT_DIR}
+    export BERT_MODEL1=${OUTPUT_DIR}/checkpoint-300 # one model infer 3 times
+    export BERT_MODEL2=${OUTPUT_DIR}/checkpoint-300
+    export BERT_MODEL3=${OUTPUT_DIR}/checkpoint-300
+    export MODEL_VERSION=2
 fi
 export ENSEMBLE_DIR=${OUTPUT_DIR}/generated_data_ensemble
 export OUTPUT_PREFIX=${DATA_DIR}/${1}_${TEST_BASE}.tsv

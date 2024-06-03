@@ -74,7 +74,7 @@ def calc_sample_scores(files, first_period=True, score_type='vader'):
 	return list(zip(lines, scores))
 
 
-def plot_scores(score_list, label_list, ratio=False):
+def plot_scores(score_list, label_list, ratio=False, params = None):
 	"""Plot sentiment"""
 	width = 0.15
 	ind = np.arange(3)
@@ -103,7 +103,9 @@ def plot_scores(score_list, label_list, ratio=False):
 		        label=label)
 	plt.xticks(ind + width * 3, ['negative', 'neutral', 'positive'])
 	plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=3, fancybox=True, shadow=True, framealpha=0.9)
-	plt.show()
+	plt.title(f'{params.model_type}_{params.bias_dim}')
+	plt.savefig(f'./log/fig/{params.model_type}_{params.bias_dim}.png')
+	# plt.show()
 
 
 def respect_in_string(s):
@@ -226,7 +228,7 @@ def main():
 				raise NotImplementedError('Unidentified demographic: %s' % l)
 
 	scores = list(scores.values())
-	plot_scores(scores, [BLACK, WHITE, MAN, WOMAN, STRAIGHT, GAY], ratio=True)
+	plot_scores(scores, [BLACK, WHITE, MAN, WOMAN, STRAIGHT, GAY], ratio=True, params = params)
 
 
 if __name__ == '__main__':
